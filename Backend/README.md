@@ -30,6 +30,14 @@
 - **Role-Based Access Control (RBAC)**: Fine-grained permissions for User and Admin roles.
 - **Data Integrity**: Audit logging and standardized error handling for all financial transactions.
 
+## 🔌 API Integration
+This project is built with an **API-First** architecture. It is designed to be easily consumed by:
+- Modern Web Frontends (React, Vue, Next.js)
+- Mobile Applications (Flutter, React Native)
+- Other Microservices
+
+For a deep dive into integration, see the [**API Integration Guide**](./API_GUIDE.md).
+
 ---
 
 ## 🛠️ Technology Stack
