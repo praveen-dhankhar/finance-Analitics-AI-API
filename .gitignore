@@ -27,3 +27,6 @@ logs/
 # Misc
 *.swp
 *.swo
+
+# Sensitive files
+src/main/resources/application.properties
