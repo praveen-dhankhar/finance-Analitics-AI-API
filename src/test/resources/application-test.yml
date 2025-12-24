@@ -1,0 +1,106 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+    allow-circular-references: true
+    lazy-initialization: true
+  autoconfigure:
+    exclude: []
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      idle-timeout: 30000
+      max-lifetime: 120000
+      connection-timeout: 20000
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+        generate_statistics: false
+  flyway:
+    enabled: false
+
+  h2:
+    console:
+      enabled: false
+
+  mvc:
+    throw-exception-if-no-handler-found: true
+  web:
+    resources:
+      add-mappings: false
+
+server:
+  port: 0
+  shutdown: immediate
+
+management:
+  server:
+    port: 0
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    com.financeapp: DEBUG
+    org.testcontainers: INFO
+
+app:
+  ratelimiter:
+    enabled: false
+  # Override prod-like app/env settings with safe test defaults
+  jwt:
+    secret: 2f7c9d8b1a3e5f7c9d8b1a3e5f7c9d8b1a3e5f7c9d8b1a3e5f7c9d8b1a3e5f7c
+    expiration: 3600000
+    refresh-expiration: 7200000
+
+security:
+  cors:
+    allowed-origins: http://localhost
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: false
+    max-age: 3600
+
+test:
+  security:
+    permissive: true
+  auth:
+    bypass-manager: true
+
+# Ensure any DB_* env lookups resolve safely in tests
+DB_HOST: localhost
+DB_PORT: 5432
+DB_NAME: testdb
+DB_USERNAME: sa
+DB_PASSWORD: ""
+DB_SSLMODE: disable
+
+# Disable OpenAPI/Swagger in tests to reduce surface and speed up context
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# (removed duplicate test key)
+

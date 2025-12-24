@@ -1,0 +1,29 @@
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.jar
+.mvn/
+
+# IDEs
+.idea/
+*.iml
+.project
+.classpath
+.settings/
+/.classpath
+/.project
+/.settings/
+
+# OS
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Env
+.env
+
+# Misc
+*.swp
+*.swo
