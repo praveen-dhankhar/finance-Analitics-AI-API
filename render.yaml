@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: finflow-ai-backend
+    runtime: docker
+    dockerContext: Backend
+    dockerfilePath: Dockerfile
+    plan: free
+    region: oregon
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SPRING_DATASOURCE_URL
+        fromDatabase:
+          name: finflow-db
+          property: connectionString
+
+databases:
+  - name: finflow-db
+    plan: free
+    region: oregon
+    postgresMajorVersion: "15"
