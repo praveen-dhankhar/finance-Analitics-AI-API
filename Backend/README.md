@@ -116,4 +116,4 @@ Database schema changes are managed via Flyway in `src/main/resources/db/migrati
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
-*Developed with ❤️ by the FinFlow Team*
+*Developed with ❤️ by Praveen Dhankhar*
