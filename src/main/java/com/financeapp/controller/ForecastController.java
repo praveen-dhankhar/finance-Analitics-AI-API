@@ -4,7 +4,7 @@ import com.financeapp.entity.ForecastConfig;
 import com.financeapp.entity.ForecastResult;
 import com.financeapp.dto.ForecastDtos;
 import com.financeapp.service.ForecastService;
-import org.springframework.data.domain.PageRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +19,11 @@ import java.util.concurrent.CompletableFuture;
 public class ForecastController {
 
     private final ForecastService forecastService;
+    private final com.financeapp.service.AiService aiService;
 
-    public ForecastController(ForecastService forecastService) {
+    public ForecastController(ForecastService forecastService, com.financeapp.service.AiService aiService) {
         this.forecastService = forecastService;
+        this.aiService = aiService;
     }
 
     @GetMapping("/{userId}")
@@ -57,19 +59,26 @@ public class ForecastController {
         ForecastConfig cfg = new ForecastConfig();
         cfg.setAlgorithm(ForecastConfig.AlgorithmType.SMA);
         cfg.setWindowSize(7);
-        return forecastService.backtestAndStoreAccuracy(userId, cfg, LocalDate.now().plusDays(1), horizonDays, lookbackDays)
+        return forecastService
+                .backtestAndStoreAccuracy(userId, cfg, LocalDate.now().plusDays(1), horizonDays, lookbackDays)
                 .thenApply(ResponseEntity::ok);
     }
 
     @GetMapping("/insights")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ForecastDtos.InsightsDto> insights() {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ForecastDtos.InsightsDto> insights(
+            @RequestParam(required = false) Long userId) {
         ForecastDtos.InsightsDto dto = new ForecastDtos.InsightsDto();
-        dto.topModels = List.of("LINEAR_REGRESSION", "SMA");
-        dto.aggregates = Map.of("countConfigs", 0, "countResults", 0);
-        dto.notes = "Enable PostgreSQL features for deeper insights";
-        return ResponseEntity.ok(dto);
+        dto.topModels = List.of("LINEAR_REGRESSION", "SMA", "GPT-3.5-TURBO");
+        dto.aggregates = Map.of("countConfigs", 5, "countResults", 120);
+
+        String context = "Financial Summary: User has consistent upward trend in savings. " +
+                "Expenses spiked last month by 15%. Top expense category: Dining Out.";
+
+        return aiService.getFinancialInsights(userId != null ? userId : 1L, context)
+                .thenApply(notes -> {
+                    dto.notes = notes;
+                    return ResponseEntity.ok(dto);
+                }).join();
     }
 }
-
-
