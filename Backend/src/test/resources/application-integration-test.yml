@@ -49,3 +49,12 @@ logging:
     com.financeapp: DEBUG
     org.testcontainers: INFO
 
+gemini:
+  api:
+    key: test-gemini-key
+
+openai:
+  api:
+    key: test-openai-key
+  embedding:
+    model: text-embedding-3-small

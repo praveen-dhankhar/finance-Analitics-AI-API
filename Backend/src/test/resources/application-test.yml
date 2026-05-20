@@ -87,6 +87,16 @@ test:
   auth:
     bypass-manager: true
 
+gemini:
+  api:
+    key: test-gemini-key
+
+openai:
+  api:
+    key: test-openai-key
+  embedding:
+    model: text-embedding-3-small
+
 # Ensure any DB_* env lookups resolve safely in tests
 DB_HOST: localhost
 DB_PORT: 5432
@@ -103,4 +113,3 @@ springdoc:
     enabled: false
 
 # (removed duplicate test key)
-

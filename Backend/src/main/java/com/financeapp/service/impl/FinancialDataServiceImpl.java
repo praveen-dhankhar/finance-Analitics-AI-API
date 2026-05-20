@@ -1,5 +1,9 @@
 package com.financeapp.service.impl;
 
+import dev.langchain4j.data.document.Metadata;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 import com.financeapp.dto.FinancialDataDto;
 import com.financeapp.dto.FinancialDataCreateDto;
 import com.financeapp.dto.FinancialDataResponseDto;
@@ -46,6 +50,12 @@ public class FinancialDataServiceImpl implements FinancialDataService {
 
     @Autowired
     private FinancialDataMapper financialDataMapper;
+
+    @Autowired
+    private EmbeddingModel embeddingModel;
+
+    @Autowired
+    private EmbeddingStore<TextSegment> embeddingStore;
 
     @Override
     @Transactional(readOnly = true)
@@ -95,6 +105,7 @@ public class FinancialDataServiceImpl implements FinancialDataService {
         financialData.setUpdatedAt(java.time.OffsetDateTime.now());
         
         FinancialData savedFinancialData = financialDataRepository.save(financialData);
+        indexFinancialData(savedFinancialData);
         
         logger.info("Financial data created successfully with ID: {}", savedFinancialData.getId());
         return financialDataMapper.toResponseDto(savedFinancialData);
@@ -136,6 +147,7 @@ public class FinancialDataServiceImpl implements FinancialDataService {
         financialData.setUpdatedAt(java.time.OffsetDateTime.now());
 
         FinancialData saved = financialDataRepository.save(financialData);
+        indexFinancialData(saved);
         return financialDataMapper.toResponseDto(saved);
     }
 
@@ -233,6 +245,7 @@ public class FinancialDataServiceImpl implements FinancialDataService {
         }
         
         List<FinancialData> savedFinancialData = financialDataRepository.saveAll(validFinancialData);
+        savedFinancialData.forEach(this::indexFinancialData);
         
         Map<String, Object> result = new HashMap<>();
         result.put("createdCount", savedFinancialData.size());
@@ -574,6 +587,34 @@ public class FinancialDataServiceImpl implements FinancialDataService {
         if (financialDataDto.date() == null) {
             throw new ValidationException("Date is required");
         }
+    }
+
+    private void indexFinancialData(FinancialData financialData) {
+        try {
+            TextSegment segment = buildFinancialDataSegment(financialData);
+            var embedding = embeddingModel.embed(segment).content();
+            embeddingStore.add(embedding, segment);
+        } catch (Exception e) {
+            logger.warn("Failed to index financial data {} for RAG: {}", financialData.getId(), e.getMessage(), e);
+        }
+    }
+
+    private TextSegment buildFinancialDataSegment(FinancialData financialData) {
+        List<String> parts = new ArrayList<>();
+        parts.add(financialData.getCategory().name());
+
+        if (financialData.getDescription() != null && !financialData.getDescription().isBlank()) {
+            parts.add(financialData.getDescription().trim());
+        }
+
+        parts.add(financialData.getAmount().toPlainString());
+
+        Metadata metadata = Metadata.from(Map.of(
+                "userId", String.valueOf(financialData.getUser().getId()),
+                "financialDataId", String.valueOf(financialData.getId())
+        ));
+
+        return TextSegment.from(String.join(" ", parts), metadata);
     }
 
     private String exportToCsv(List<FinancialData> financialDataList) {
