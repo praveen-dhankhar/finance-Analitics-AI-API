@@ -13,6 +13,7 @@
 
 ### 🧠 AI-Powered Insights
 - **Gemini AI Integration**: Uses Google's latest `gemini-2.5-flash` model to analyze financial summaries.
+- **Vector Search & RAG**: Integrates `pgvector` with PostgreSQL and `LangChain4j` for advanced semantic search capabilities and enriched AI contextual understanding.
 - **Narrative Analysis**: Generates human-readable insights about spending patterns, savings momentum, and potential risks.
 - **Contextual Intelligence**: Analyzes spikes in expenses (e.g., "15% increase in Dining Out") and provides specific tactical advice.
 
@@ -36,7 +37,7 @@ This project is built with an **API-First** architecture. It is designed to be e
 - Mobile Applications (Flutter, React Native)
 - Other Microservices
 
-For a deep dive into integration, see the [**API Integration Guide**](./API_GUIDE.md).
+For a deep dive into integration, see the [**API Integration Guide**](./Backend/API_GUIDE.md).
 
 ---
 
@@ -45,12 +46,13 @@ For a deep dive into integration, see the [**API Integration Guide**](./API_GUID
 | Layer | Technology |
 | :--- | :--- |
 | **Framework** | Spring Boot 3.3.4 (Java 21) |
-| **AI SDK** | Google Gen AI Java SDK (`com.google.genai`) |
-| **Database** | PostgreSQL (Production) / H2 (Development) |
+| **AI SDK** | Google Gen AI Java SDK (`com.google.genai`), LangChain4j |
+| **Database** | PostgreSQL (with pgvector) / H2 (Development) |
 | **Migrations** | Flyway DB |
 | **Security** | Spring Security, JJWT |
 | **Documentation** | SpringDoc OpenAPI (Swagger UI) |
 | **Monitoring** | Spring Boot Actuator, Prometheus |
+| **Deployment**| Render (Docker & Managed PostgreSQL) |
 
 ---
 
@@ -66,7 +68,7 @@ For a deep dive into integration, see the [**API Integration Guide**](./API_GUID
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/praveen-dhankhar/finance-Analitics-AI-API.git
-   cd FinFlow-Ai
+   cd finance-Analitics-AI-API/Backend
    ```
 
 2. **Configure Environment**:
@@ -110,13 +112,21 @@ For a deep dive into integration, see the [**API Integration Guide**](./API_GUID
 ## 🧪 Development Workflow
 
 ### Testing
-We use JUnit 5 and Spring Security Test for comprehensive coverage:
+We use JUnit 5, Spring Security Test, and **Testcontainers** (with PostgreSQL) for comprehensive unit and integration test coverage:
 ```bash
 mvn test
 ```
 
 ### Migrations
 Database schema changes are managed via Flyway in `src/main/resources/db/migration`. Any new `.sql` file added there will be automatically applied on startup.
+
+---
+
+## ☁️ Deployment
+
+The repository includes a `render.yaml` configuration for seamless deployment on [Render](https://render.com/). 
+- **Web Service**: Runs the Spring Boot app compiled via the included Dockerfile.
+- **Database**: Provisions a managed PostgreSQL 15 instance linked directly to the application.
 
 ---
 
