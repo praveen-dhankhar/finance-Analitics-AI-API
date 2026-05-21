@@ -48,18 +48,3 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
-      - name: Docker login
-        if: github.ref == 'refs/heads/main'
-        run: echo "${RAILWAY_TOKEN}" | docker login "${RAILWAY_REGISTRY}" -u token --password-stdin
-        env:
-          RAILWAY_REGISTRY: ${{ secrets.RAILWAY_REGISTRY }}
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-      - name: Docker build and push
-        if: github.ref == 'refs/heads/main'
-        run: |
-          docker build -f Backend/Dockerfile -t "${RAILWAY_REGISTRY}/finance-analitics-ai-api-app:latest" Backend
-          docker push "${RAILWAY_REGISTRY}/finance-analitics-ai-api-app:latest"
-        env:
-          RAILWAY_REGISTRY: ${{ secrets.RAILWAY_REGISTRY }}

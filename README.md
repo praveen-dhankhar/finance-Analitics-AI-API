@@ -52,7 +52,7 @@ For a deep dive into integration, see the [**API Integration Guide**](./Backend/
 | **Security** | Spring Security, JJWT |
 | **Documentation** | SpringDoc OpenAPI (Swagger UI) |
 | **Monitoring** | Spring Boot Actuator, Prometheus |
-| **Deployment**| Render (Docker & Managed PostgreSQL) |
+| **Deployment**| Railway (Docker & Managed PostgreSQL) |
 
 ---
 
@@ -124,9 +124,16 @@ Database schema changes are managed via Flyway in `src/main/resources/db/migrati
 
 ## ☁️ Deployment
 
-The repository includes a `render.yaml` configuration for seamless deployment on [Render](https://render.com/). 
-- **Web Service**: Runs the Spring Boot app compiled via the included Dockerfile.
+Deployment is automated via GitHub Actions workflows that deploy to [Railway](https://railway.app/) using the Dockerfile in `Backend/`.
+- **Web Service**: Builds and runs the Spring Boot app using the included Dockerfile.
 - **Database**: Provisions a managed PostgreSQL 15 instance linked directly to the application.
+- **Required Railway environment variables**:
+  - `SPRING_DATASOURCE_URL`
+  - `SPRING_DATASOURCE_USERNAME`
+  - `SPRING_DATASOURCE_PASSWORD`
+  - `GEMINI_API_KEY`
+  - `OPENAI_API_KEY`
+  - `JWT_SECRET`
 
 ---
 
