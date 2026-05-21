@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: financeapp
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d financeapp"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+
+      - name: Enable pgvector extension
+        run: psql -h localhost -U postgres -d financeapp -c "CREATE EXTENSION IF NOT EXISTS vector;"
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Maven verify
+        run: mvn verify -B
+        working-directory: Backend
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+      - name: Docker login
+        if: github.ref == 'refs/heads/main'
+        run: echo "${RAILWAY_TOKEN}" | docker login "${RAILWAY_REGISTRY}" -u token --password-stdin
+        env:
+          RAILWAY_REGISTRY: ${{ secrets.RAILWAY_REGISTRY }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Docker build and push
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker build -f Backend/Dockerfile -t "${RAILWAY_REGISTRY}/finance-analitics-ai-api-app:latest" Backend
+          docker push "${RAILWAY_REGISTRY}/finance-analitics-ai-api-app:latest"
+        env:
+          RAILWAY_REGISTRY: ${{ secrets.RAILWAY_REGISTRY }}

@@ -600,21 +600,22 @@ public class FinancialDataServiceImpl implements FinancialDataService {
     }
 
     private TextSegment buildFinancialDataSegment(FinancialData financialData) {
-        List<String> parts = new ArrayList<>();
-        parts.add(financialData.getCategory().name());
-
-        if (financialData.getDescription() != null && !financialData.getDescription().isBlank()) {
-            parts.add(financialData.getDescription().trim());
-        }
-
-        parts.add(financialData.getAmount().toPlainString());
+        String description = financialData.getDescription() != null
+                ? financialData.getDescription().trim()
+                : "";
+        String text = String.format(
+                "%s %s %s",
+                financialData.getCategory().name(),
+                description,
+                financialData.getAmount().toPlainString()
+        ).trim();
 
         Metadata metadata = Metadata.from(Map.of(
                 "userId", String.valueOf(financialData.getUser().getId()),
                 "financialDataId", String.valueOf(financialData.getId())
         ));
 
-        return TextSegment.from(String.join(" ", parts), metadata);
+        return TextSegment.from(text, metadata);
     }
 
     private String exportToCsv(List<FinancialData> financialDataList) {

@@ -1,0 +1,23 @@
+name: Deploy Prod
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Deploy to Railway (prod)
+        run: railway up --service $RAILWAY_PROD_SERVICE_ID
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_PROD_SERVICE_ID: ${{ secrets.RAILWAY_PROD_SERVICE_ID }}
+
+      - name: Wait for rollout
+        run: sleep 30
+
+      - name: Health check
+        run: curl -f $PROD_URL/api/health
+        env:
+          PROD_URL: ${{ secrets.PROD_URL }}
