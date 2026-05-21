@@ -52,7 +52,7 @@ For a deep dive into integration, see the [**API Integration Guide**](./Backend/
 | **Security** | Spring Security, JJWT |
 | **Documentation** | SpringDoc OpenAPI (Swagger UI) |
 | **Monitoring** | Spring Boot Actuator, Prometheus |
-| **Deployment**| Railway (Docker & Managed PostgreSQL) |
+| **Deployment** | Railway (Docker & Managed PostgreSQL) |
 
 ---
 
