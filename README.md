@@ -125,7 +125,7 @@ Database schema changes are managed via Flyway in `src/main/resources/db/migrati
 ## ☁️ Deployment
 
 Deployment is automated via GitHub Actions workflows that deploy to [Railway](https://railway.app/) using the Dockerfile in `Backend/`.
-- **Web Service**: Runs the Spring Boot app compiled via the included Dockerfile.
+- **Web Service**: Builds and runs the Spring Boot app using the included Dockerfile.
 - **Database**: Provisions a managed PostgreSQL 15 instance linked directly to the application.
 - **Required Railway environment variables**:
   - `SPRING_DATASOURCE_URL`
