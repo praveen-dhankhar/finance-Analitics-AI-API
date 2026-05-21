@@ -21,6 +21,12 @@ public class ForecastController {
     private final ForecastService forecastService;
     private final com.financeapp.service.AiService aiService;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.financeapp.repository.UserRepository userRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private org.springframework.cache.CacheManager cacheManager;
+
     public ForecastController(ForecastService forecastService, com.financeapp.service.AiService aiService) {
         this.forecastService = forecastService;
         this.aiService = aiService;
@@ -80,5 +86,18 @@ public class ForecastController {
                     dto.notes = notes;
                     return ResponseEntity.ok(dto);
                 }).join();
+    }
+
+    @DeleteMapping("/conversation")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> clearConversation() {
+        String username = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getName();
+        userRepository.findByUsername(username).ifPresent(user -> {
+            org.springframework.cache.Cache cache = cacheManager.getCache("forecasts");
+            if (cache != null) {
+                cache.evict("conv::" + user.getId());
+            }
+        });
+        return ResponseEntity.ok().build();
     }
 }

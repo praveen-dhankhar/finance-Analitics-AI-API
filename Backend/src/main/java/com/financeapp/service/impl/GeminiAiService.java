@@ -39,6 +39,12 @@ public class GeminiAiService implements AiService {
     @Autowired
     private EmbeddingStore<TextSegment> embeddingStore;
 
+    @Autowired
+    private org.springframework.cache.CacheManager cacheManager;
+
+    public record ChatMessage(String role, String text) {}
+    public record CachedConversation(List<ChatMessage> messages, long expiresAt) {}
+
     @Override
     @Async
     public CompletableFuture<String> getFinancialInsights(Long userId, String context) {
@@ -52,12 +58,45 @@ public class GeminiAiService implements AiService {
             String retrievedContext = retrieveRelevantContext(userId, context);
             String prompt = buildPrompt(context, retrievedContext);
 
+            // Load history
+            List<ChatMessage> history = new java.util.ArrayList<>();
+            org.springframework.cache.Cache cache = cacheManager.getCache("forecasts");
+            if (cache != null) {
+                CachedConversation conv = cache.get("conv::" + userId, CachedConversation.class);
+                if (conv != null && System.currentTimeMillis() < conv.expiresAt()) {
+                    history.addAll(conv.messages());
+                }
+            }
+
+            // Append user message
+            history.add(new ChatMessage("user", prompt));
+
+            // Prepare prompt with history
+            StringBuilder fullPrompt = new StringBuilder();
+            for (ChatMessage msg : history) {
+                fullPrompt.append(msg.role().toUpperCase()).append(":\n").append(msg.text()).append("\n\n");
+            }
+
             GenerateContentResponse response = client.models.generateContent(
                     model,
-                    prompt,
+                    fullPrompt.toString().trim(),
                     null);
 
             String text = response.text();
+
+            // Append assistant response
+            history.add(new ChatMessage("assistant", text));
+
+            // Cap history at 10 messages (drop oldest)
+            if (history.size() > 10) {
+                history = new java.util.ArrayList<>(history.subList(history.size() - 10, history.size()));
+            }
+
+            // Save back to cache
+            if (cache != null) {
+                long expiresAt = System.currentTimeMillis() + (30 * 60 * 1000L); // 30 mins TTL
+                cache.put("conv::" + userId, new CachedConversation(history, expiresAt));
+            }
 
             log.info("Successfully received Gemini AI insights for user {}", userId);
             return CompletableFuture.completedFuture(text);
