@@ -2,6 +2,7 @@ package com.financeapp.config;
 
 import com.financeapp.security.JwtAuthenticationEntryPoint;
 import com.financeapp.security.JwtAuthenticationFilter;
+import com.financeapp.security.JwtBlacklistService;
 import com.financeapp.security.JwtTokenProvider;
 import com.financeapp.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtBlacklistService jwtBlacklistService;
 
     // PasswordEncoder bean is provided by PasswordEncoderConfig to avoid duplicate bean definitions
 
@@ -102,7 +106,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService);
+        return new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService, jwtBlacklistService);
     }
 
     @Bean
