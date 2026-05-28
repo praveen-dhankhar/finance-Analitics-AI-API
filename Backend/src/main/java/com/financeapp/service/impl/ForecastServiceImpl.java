@@ -179,12 +179,11 @@ public class ForecastServiceImpl implements ForecastService {
             if (counts[i] > 0) season[i] /= counts[i]; else season[i] = 0.0;
         }
 
-        // Trend via linear regression
+        // Trend via linear regression projected for the forecast horizon
         double[] trend = linearRegressionForecast(values, horizon + seasonLength);
         double[] out = new double[horizon];
         for (int i = 0; i < horizon; i++) {
-            out[i] = Math.max(0.0, trend[i] + season[(values.size() + i) % seasonLength] - seasonLength > 0 ? 0 : 0);
-            // simplified: trend plus seasonal component (centered minimalistically)
+            // Trend plus seasonal component for the upcoming position in the cycle
             out[i] = trend[i] + season[(values.size() + i) % seasonLength];
         }
         return out;

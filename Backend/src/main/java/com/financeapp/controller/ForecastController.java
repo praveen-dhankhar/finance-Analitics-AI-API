@@ -72,7 +72,7 @@ public class ForecastController {
 
     @GetMapping("/insights")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<ForecastDtos.InsightsDto> insights(
+    public CompletableFuture<ResponseEntity<ForecastDtos.InsightsDto>> insights(
             @RequestParam(required = false) Long userId) {
         ForecastDtos.InsightsDto dto = new ForecastDtos.InsightsDto();
         dto.topModels = List.of("LINEAR_REGRESSION", "SMA", "GPT-3.5-TURBO");
@@ -85,7 +85,7 @@ public class ForecastController {
                 .thenApply(notes -> {
                     dto.notes = notes;
                     return ResponseEntity.ok(dto);
-                }).join();
+                });
     }
 
     @DeleteMapping("/conversation")
