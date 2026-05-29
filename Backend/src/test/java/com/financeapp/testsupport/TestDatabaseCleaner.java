@@ -16,10 +16,12 @@ public class TestDatabaseCleaner {
         // Delete in FK-safe order; tables may not all exist in H2 for every test run
         String[] tablesInOrder = new String[]{
                 "forecast_anomalies",
-                "forecast_performances",
                 "forecast_results",
+                "forecast_performance",
                 "forecasts",
+                "forecast_configs",
                 "financial_data",
+                "transactions",
                 "categories",
                 "user_profiles",
                 "accounts",
@@ -37,5 +39,4 @@ public class TestDatabaseCleaner {
         }
     }
 }
-
 
