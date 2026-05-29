@@ -1,7 +1,7 @@
 # 💰 FinFlow AI - Advanced Financial Analytics & Forecasting
 
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.4-6DB33F?style=flat&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
-[![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=java&logoColor=white)](https://www.oracle.com/java/)
+[![Java 17](https://img.shields.io/badge/Java-17-ED8B00?style=flat&logo=java&logoColor=white)](https://www.oracle.com/java/)
 [![Google Gemini](https://img.shields.io/badge/AI-Google%20Gemini-4285F4?style=flat&logo=google-gemini&logoColor=white)](https://deepmind.google/technologies/gemini/)
 [![Maven](https://img.shields.io/badge/Build-Maven-C71A36?style=flat&logo=apache-maven&logoColor=white)](https://maven.apache.org/)
 
@@ -45,7 +45,7 @@ For a deep dive into integration, see the [**API Integration Guide**](./Backend/
 
 | Layer | Technology |
 | :--- | :--- |
-| **Framework** | Spring Boot 3.3.4 (Java 21) |
+| **Framework** | Spring Boot 3.3.4 (Java 17) |
 | **AI SDK** | Google Gen AI Java SDK (`com.google.genai`), LangChain4j |
 | **Database** | PostgreSQL (with pgvector) / H2 (Development) |
 | **Migrations** | Flyway DB |
@@ -59,7 +59,7 @@ For a deep dive into integration, see the [**API Integration Guide**](./Backend/
 ## 🚦 Getting Started
 
 ### Prerequisites
-- **JDK 21** or higher
+- **JDK 17** or higher
 - **Maven 3.x**
 - **Google AI Studio API Key** (for Gemini features)
 
