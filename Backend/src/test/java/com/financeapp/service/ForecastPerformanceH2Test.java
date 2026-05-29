@@ -7,6 +7,9 @@ import com.financeapp.entity.enums.Category;
 import com.financeapp.entity.enums.TransactionType;
 import com.financeapp.repository.FinancialDataRepository;
 import com.financeapp.repository.UserRepository;
+import com.financeapp.testsupport.TestDatabaseCleaner;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +31,18 @@ public class ForecastPerformanceH2Test {
     private UserRepository userRepository;
     @Autowired
     private FinancialDataRepository financialDataRepository;
+    @Autowired
+    private TestDatabaseCleaner cleaner;
+
+    @BeforeEach
+    void setUp() {
+        cleaner.clean();
+    }
+
+    @AfterEach
+    void tearDown() {
+        cleaner.clean();
+    }
 
     @Test
     void largeDataset_shouldForecastQuickly() {
@@ -62,5 +77,4 @@ public class ForecastPerformanceH2Test {
         assertThat(dt).isLessThan(2000);
     }
 }
-
 
